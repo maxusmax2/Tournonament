@@ -2,9 +2,9 @@
 
 namespace Tournonamemt.Models
 {
-    public class Players
+    public class Player
     {
-        public string Id { get; set; }
+        public int Id { get; set; }
         public string NickName { get; set; }
         public DateTime Birthday { get; set; }
         public string AboutMe { get; set; }
