@@ -16,15 +16,15 @@ namespace Tournonamemt.Services
                     var secondParticipant = group.Participants[j];
                     var match = new Match
                     {
-                        Participants = new List<Player> { firstParticipant, secondParticipant },
+                        Participants = new List<User> { firstParticipant, secondParticipant },
                         TournamentId = group.TournamentId,
                         IsGroupStep = true,
                         Number = matchCounter,
                         ParticipantNumber = 2,
                         Scores = new List<Score>
                         {
-                        new Score {Player = firstParticipant},
-                        new Score {Player = secondParticipant}
+                        new Score {Player = firstParticipant,PlayerId = firstParticipant.Id},
+                        new Score {Player = secondParticipant,PlayerId = secondParticipant.Id}
                     }
                     };
                     matchCounter++;

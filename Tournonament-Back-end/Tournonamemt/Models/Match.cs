@@ -14,7 +14,7 @@ namespace Tournonamemt.Models
         public MatchStatus status { get; set; } = MatchStatus.Init;
         public int TournamentId { get; set; }
         public Tournament Tournament { get; set; }
-        public List<Player> Participants { get; set; }
-        public List<Score> Scores { get; set; }
+        public List<User> Participants { get; set; } = new List<User>();
+        public List<Score> Scores { get; set; } = new List<Score>();
     }
 }

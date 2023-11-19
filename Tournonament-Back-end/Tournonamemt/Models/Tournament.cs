@@ -23,9 +23,11 @@ namespace Tournonamemt.Models
         public int BracketId { get; set; }
         public Bracket Bracket { get; set; }
         public int WinnerId { get; set; }
-        public Player Winner { get; set; }
-        public List<Player> Participants { get; set; }
+        public User Winner { get; set; }
+        public List<User> Participants { get; set; }
 
+
+        public Tournament() { }
         public Tournament(TournamentCreateDto tournamentCreateDto)
         {
             Name = tournamentCreateDto.Name;
@@ -47,7 +49,7 @@ namespace Tournonamemt.Models
                 Groups = new();
                 for (int i = 1; i <= GroupNumber; i++)
                 {
-                    Groups.Add(new Group { GroupNumber = i });
+                    Groups.Add(new Group { GroupNumber = i , TournamentId = Id});
                 }
             }
 

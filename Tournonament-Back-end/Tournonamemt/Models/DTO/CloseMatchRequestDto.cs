@@ -2,8 +2,8 @@
 {
     public class CloseMatchRequestDto
     {
-        public int TournamentId;
-        public int MatchId;
-        public List<Score> ScoreList = new();
+        public int TournamentId { get; set; }
+        public int MatchId { get; set; }
+        public List<ScoreDto> ScoreList { get; set; }
     }
 }

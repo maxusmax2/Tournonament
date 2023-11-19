@@ -11,7 +11,8 @@ namespace Tournonamemt.Services.Interface
         Task<Tournament> DeclineTournamentAsync(int tournamentId);
         Task<Tournament> AddParticipantAsync(int playerId, int tournamentId);
         Task<Tournament> RemoveParticipantAsync(int playerId, int tournamentId);
-        Task<Tournament> CloseMatch(CloseMatchRequestDto request);
-        Task<Tournament?> CloseGroups(int tournamentId);
+        Task<Tournament> CloseMatchAsync(CloseMatchRequestDto request);
+        Task<Tournament?> CloseGroupsAsync(int tournamentId);
+        Task<Tournament> CloseParticipantRecruitmentAsync(int tournamentId);
     }
 }

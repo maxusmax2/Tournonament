@@ -21,13 +21,13 @@ namespace Tournonamemt.Services
             return tournament;
 
         }
-        public async Task<bool> CalcCloseMatch(Bracket bracket, Match match)
+        public async Task<bool> CalcCloseMatch(Tournament tournament, Match match)
         {
-            if (bracket.Tournament.Format == TournamentFormat.Knockout)
+            if (tournament.Format == TournamentFormat.Knockout)
             {
-                await CalcKnockout(bracket, match);
+                await CalcKnockout(tournament.Bracket, match);
             }
-            else if (bracket.Tournament.Format == TournamentFormat.DoubleElimination)
+            else if (tournament.Format == TournamentFormat.DoubleElimination)
             {
                 return false;//Не будет в прототипе
             }
