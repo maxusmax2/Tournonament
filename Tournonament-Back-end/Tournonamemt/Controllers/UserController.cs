@@ -1,6 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-
-using Tournonamemt.Models;
 using Tournonamemt.Models.DTO;
 using Tournonamemt.Services.Interface;
 
@@ -17,14 +15,24 @@ namespace Tournonamemt.Controllers
             _userService = userService;
         }
         [HttpGet]
-        public async Task<User> Get(int userId)
+        public async Task<IActionResult> Get(int userId)
         {
-            return await _userService.Get(userId);
+            var user = await _userService.Get(userId);
+            if (user is null)
+                return NotFound();
+
+            return Ok(user);
         }
+
         [HttpPost]
-        public async Task<User> Create(UserCreateDto dto)
+        public async Task<IActionResult> Create(UserCreateDto dto)
         {
-            return await _userService.Create(dto);
+            var user = await _userService.Create(dto);
+            if (user is null)
+                return BadRequest();
+
+            return Ok(user);
+
         }
     }
 }

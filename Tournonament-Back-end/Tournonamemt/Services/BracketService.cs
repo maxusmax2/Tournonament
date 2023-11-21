@@ -1,11 +1,16 @@
 ﻿using Tournonamemt.Models;
+using Tournonamemt.Repository.Interface;
 using Tournonamemt.Services.Interface;
 
 namespace Tournonamemt.Services
 {
     public class BracketService : IBracketService
     {
-
+        private readonly ITourRepository _tourRepository;
+        public BracketService(ITourRepository tourRepository)
+        {
+            _tourRepository = tourRepository;
+        }
         public Tournament CreateBracketMatches(Tournament tournament)
         {
             var firstTour = tournament.Bracket.Tours.First(x => x.TourNumber == 1);
@@ -45,11 +50,10 @@ namespace Tournonamemt.Services
                 return true;
             }
             var nextMatchNumber = Math.Ceiling(match.Number / 2.0);
-            var nextTour = bracket.Tours.FirstOrDefault(x => x.TourNumber == currentTour + 1);
+            var nextTour = await _tourRepository.GetAsync(bracket.Tours.FirstOrDefault(x => x.TourNumber == currentTour + 1).Id);
 
             var nextMatch = nextTour.Matches.FirstOrDefault(x => x.Number == nextMatchNumber);
-            match.Participants.Add(winner);
-            match.Scores.Add(new Score { Player = winner, PlayerId = winner.Id });
+            nextMatch.Participants.Add(winner);
             return true;
         }
     }

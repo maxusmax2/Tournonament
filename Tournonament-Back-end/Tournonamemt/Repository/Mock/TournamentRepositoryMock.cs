@@ -3,7 +3,7 @@ using Tournonamemt.Repository.Interface;
 
 namespace Tournonamemt.Repository.Mock
 {
-    public class TournamentRepositoryMock : ITournamentRepository
+    public class TournamentRepositoryMock
     {
         private static Dictionary<int, Tournament> storage;
         private readonly IMatchRepository _matchRepository;
@@ -29,14 +29,13 @@ namespace Tournonamemt.Repository.Mock
             return storage[tournamentId];
         }
 
-        public async Task<Tournament?> SaveAsync(Tournament tournament)
+        public async Task SaveAsync(Tournament tournament)
         {
             if (tournament.Id == 0)
             {
                 var newId = storage.Keys.Max() + 1;
                 storage[newId] = tournament;
                 tournament.Id = newId;
-                return tournament;
             }
             storage[tournament.Id] = tournament;
 
@@ -57,7 +56,6 @@ namespace Tournonamemt.Repository.Mock
                     }
                 }
             }
-            return tournament;
         }
     }
 }

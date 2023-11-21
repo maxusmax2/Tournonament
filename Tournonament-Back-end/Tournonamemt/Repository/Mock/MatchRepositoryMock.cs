@@ -1,9 +1,8 @@
 ﻿using Tournonamemt.Models;
-using Tournonamemt.Repository.Interface;
 
 namespace Tournonamemt.Repository.Mock
 {
-    public class MatchRepositoryMock : IMatchRepository
+    public class MatchRepositoryMock
     {
         private static Dictionary<int, Match> storage = new Dictionary<int, Match>();
         static MatchRepositoryMock()

@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Tournonamemt.Repository;
 using Tournonamemt.Repository.Interface;
-using Tournonamemt.Repository.Mock;
 using Tournonamemt.Security;
 using Tournonamemt.Security.Interface;
 using Tournonamemt.Services;
@@ -10,20 +10,34 @@ using Tournonamemt.Services.Interface;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("corspolicy", builder =>
+    {
+        builder.WithOrigins("*").AllowAnyMethod().AllowAnyHeader();
+    });
+});
+
+builder.Services.AddControllers().AddNewtonsoftJson(options =>
+    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+);
 // Add services to the container.
 #region DI
-var key = "lectureTest1234$$$";
+var key = "lectureTest1234$lectureTest1234$";
 
 builder.Services.AddScoped<ITournamentService, TournamentService>();
 builder.Services.AddScoped<IBracketService, BracketService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IGroupService, GroupService>();
-builder.Services.AddScoped<IAuthorizationService>(_ => new AuthorizationService("lectureTest1234$$$"));
-builder.Services.AddScoped<IMatchRepository, MatchRepositoryMock>();
-builder.Services.AddScoped<ITournamentRepository, TournamentRepositoryMock>();
-builder.Services.AddScoped<IUserRepository, UserRepositoryMock>();
+builder.Services.AddScoped<IAuthorizationService, AuthorizationService>();
+builder.Services.AddScoped<IMatchRepository, MatchRepository>();
+builder.Services.AddScoped<ITournamentRepository, TournamentRepository>();
+builder.Services.AddScoped<ITourRepository, TourRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IGroupRepository, GroupRepository>();
 builder.Services.AddScoped<IRegistrationManager, RegistrationManager>();
 
+builder.Services.AddDbContext<ApplicationContext>();
 
 builder.Services.AddAuthentication(x =>
 {
@@ -49,7 +63,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
-
+app.UseCors("corspolicy");
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

@@ -1,9 +1,9 @@
-﻿using Tournonamemt.Models;
+﻿using Tournonamemt.Repository.Interface;
 
 namespace Tournonamemt.Services.Interface
 {
     public interface IAuthorizationService
     {
-        public string Authenticate(User user, string password);
+        public Task<AuthenticateResponseDto> Authenticate(string login, string password);
     }
 }

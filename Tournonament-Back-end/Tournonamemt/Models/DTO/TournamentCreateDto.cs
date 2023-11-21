@@ -12,6 +12,7 @@
         public int? GroupNumber { get; set; }
         public string Location { get; set; }
         public int DisciplineId { get; set; }
+        public int? numberLeavingTheGroup { get; set; }
 
     }
 }

@@ -2,7 +2,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using Tournonamemt.Models;
+using Tournonamemt.Repository.Interface;
 using Tournonamemt.Services.Interface;
 
 
@@ -10,22 +10,20 @@ namespace Tournonamemt.Services
 {
     public class AuthorizationService : IAuthorizationService
     {
-        private readonly string key;
+        private readonly string key = "lectureTest1234$lectureTest1234$";
+        private readonly IUserRepository _userRepository;
 
-
-        public AuthorizationService(string key)
+        public AuthorizationService(IUserRepository userRepository)
         {
-            this.key = key;
+            _userRepository = userRepository;
         }
-        public string Authenticate(User user, string password)
+        public async Task<AuthenticateResponseDto> Authenticate(string login, string password)
         {
-
+            var user = await _userRepository.GetByLoginAsync(login);
+            if (user is null) return null;
             bool verify = BCrypt.Net.BCrypt.Verify(password, user.Password);
 
-            if (!verify)
-            {
-                throw new ArgumentException("WRONG PASSWORD");
-            }
+            if (!verify) return null;
 
             JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
             var tokenKey = Encoding.ASCII.GetBytes(key);
@@ -44,7 +42,7 @@ namespace Tournonamemt.Services
                     SecurityAlgorithms.HmacSha256Signature)
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);
-            return tokenHandler.WriteToken(token);
+            return new AuthenticateResponseDto(user, tokenHandler.WriteToken(token));
         }
 
     }

@@ -1,4 +1,5 @@
-﻿using Tournonamemt.Models.DTO;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using Tournonamemt.Models.DTO;
 
 namespace Tournonamemt.Models
 {
@@ -15,15 +16,17 @@ namespace Tournonamemt.Models
         public TournamentStatus Status { get; set; }
         public bool WithGroupStep { get; set; }
         public int? GroupNumber { get; set; }
+        public int? numberLeavingTheGroup { get; set; }
         public List<Group> Groups { get; set; }
         public string Location { get; set; }
-        public string ImageUrl { get; set; }
+        public string? ImageUrl { get; set; }
         public int DisciplineId { get; set; }
         public Discipline Discipline { get; set; }
         public int BracketId { get; set; }
         public Bracket Bracket { get; set; }
-        public int WinnerId { get; set; }
-        public User Winner { get; set; }
+        public int? WinnerId { get; set; }
+        [NotMapped]
+        public User? Winner { get; set; }
         public List<User> Participants { get; set; }
 
 
@@ -32,6 +35,7 @@ namespace Tournonamemt.Models
         {
             Name = tournamentCreateDto.Name;
             Date = tournamentCreateDto.Date;
+            numberLeavingTheGroup = tournamentCreateDto.numberLeavingTheGroup;
             ParticipantNumber = 0;
             ParticipantNumberMax = tournamentCreateDto.ParticipantNumberMax;
             PrizeFund = tournamentCreateDto.PrizeFund;
@@ -49,7 +53,7 @@ namespace Tournonamemt.Models
                 Groups = new();
                 for (int i = 1; i <= GroupNumber; i++)
                 {
-                    Groups.Add(new Group { GroupNumber = i , TournamentId = Id});
+                    Groups.Add(new Group { GroupNumber = i, TournamentId = Id });
                 }
             }
 

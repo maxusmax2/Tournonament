@@ -1,10 +1,18 @@
 ﻿using Tournonamemt.Models;
+using Tournonamemt.Repository.Interface;
 using Tournonamemt.Services.Interface;
 
 namespace Tournonamemt.Services
 {
     public class GroupService : IGroupService
     {
+        private readonly ITourRepository _tourRepository;
+        private readonly IGroupRepository _groupRepository;
+        public GroupService(ITourRepository tourRepository, IGroupRepository groupRepository)
+        {
+            _tourRepository = tourRepository;
+            _groupRepository = groupRepository;
+        }
         public Group CreateGroupMatches(Group group)
         {
             int matchCounter = 1;
@@ -21,11 +29,6 @@ namespace Tournonamemt.Services
                         IsGroupStep = true,
                         Number = matchCounter,
                         ParticipantNumber = 2,
-                        Scores = new List<Score>
-                        {
-                        new Score {Player = firstParticipant,PlayerId = firstParticipant.Id},
-                        new Score {Player = secondParticipant,PlayerId = secondParticipant.Id}
-                    }
                     };
                     matchCounter++;
                     group.Matchs.Add(match);
@@ -34,10 +37,16 @@ namespace Tournonamemt.Services
             return group;
         }
 
-        public Tournament CloseGroups(Tournament tournament)
+        public async Task<Tournament> CloseGroups(Tournament tournament)
         {
-            var PlayersInGroupByScore = tournament.Groups.
-                ToDictionary(g => g.GroupNumber,
+            var groups = new List<Group>();
+            foreach (var group in tournament.Groups)
+            {
+                groups.Add(await _groupRepository.GetAsync(group.Id));
+
+            }
+            var PlayersInGroupByScore = groups
+                .ToDictionary(g => g.GroupNumber,
                             g => g.Participants
                             .OrderBy(p => g.Matchs
                                 .Where(x => x.Participants.Contains(p))
@@ -45,22 +54,20 @@ namespace Tournonamemt.Services
                             .Select((p, i) => new { p, i })
                             .ToDictionary(x => x.i, x => x.p));
 
-            var participantCountLivingFromGroup = GetClosestPowerOf2(tournament.Groups.Select(x => x.ParticipantNumber).MinBy(x => x));
-            var tour = tournament.Bracket.Tours.FirstOrDefault(x => x.TourNumber == 1);
+            var tour = await _tourRepository.GetAsync(tournament.Bracket.Tours.FirstOrDefault(x => x.TourNumber == 1).Id);
             var matchCounter = 0;
             for (int i = 1; i < tournament.GroupNumber; i += 2)
             {
                 var firstGroup = PlayersInGroupByScore[i];
                 var secondGroup = PlayersInGroupByScore[i + 1];
-                for (int j = 1; j <= participantCountLivingFromGroup; j++)
+                for (int j = 0; j <= tournament.numberLeavingTheGroup - 1; j++)
                 {
                     var match = tour.Matches[matchCounter];
                     match.Participants.Add(firstGroup[j]);
-                    match.Participants.Add(secondGroup[participantCountLivingFromGroup + 1 - j]);
+                    match.Participants.Add(secondGroup[tournament.numberLeavingTheGroup.Value - 1 - j]);
                     matchCounter++;
                 }
             }
-
             return tournament;
         }
 

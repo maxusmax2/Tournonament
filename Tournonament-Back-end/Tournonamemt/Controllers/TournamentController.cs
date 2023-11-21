@@ -3,69 +3,102 @@ using Tournonamemt.Models;
 using Tournonamemt.Models.DTO;
 using Tournonamemt.Services.Interface;
 
-namespace Tournonamemt.Controllers
+namespace Tournonamemt.Controllers;
+
+[Route("api/[controller]")]
+[ApiController]
+public class TournamentController : ControllerBase
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class TournamentController : ControllerBase
+    private readonly ITournamentService _tournamentService;
+
+    public TournamentController(ITournamentService tournamentService)
     {
-        private readonly ITournamentService _tournamentService;
+        _tournamentService = tournamentService;
+    }
 
-        public TournamentController(ITournamentService tournamentService)
-        {
-            _tournamentService = tournamentService;
-        }
+    [HttpGet]
+    public async Task<IActionResult> Get(int tournamentId)
+    {
+        var tournament = await _tournamentService.GetTournamentAsync(tournamentId);
+        if (tournament is null) return NotFound();
+        return Ok(tournament);
+    }
+    [HttpPost]
+    public async Task<IActionResult> Create(TournamentCreateDto dto)
+    {
+        var tournament = await _tournamentService.CreateTournamentAsync(dto);
+        if (tournament is null) return BadRequest();
+        return Ok(tournament);
+    }
 
-        [HttpGet]
-        public async Task<Tournament> Get(int tournamentId)
-        {
-            return await _tournamentService.GetTournamentAsync(tournamentId);
-        }
-        [HttpPost]
-        public async Task<Tournament> Create(TournamentCreateDto dto)
-        {
-            return await _tournamentService.CreateTournamentAsync(dto);
-        }
+    [HttpPut("CloseRecruitment")]
+    public async Task<IActionResult> CloseRecruitment(int tournamentId)
+    {
+        var tournament = await _tournamentService.CloseParticipantRecruitmentAsync(tournamentId);
+        if (tournament is null) return BadRequest();
+        return Ok(tournament);
+    }
 
-        [HttpPut("CloseRecruitment")]
-        public async Task<Tournament> CloseRecruitment(int tournamentId)
-        {
-            return await _tournamentService.CloseParticipantRecruitmentAsync(tournamentId);
-        }
+    [HttpPut("AddParticipant")]
+    public async Task<IActionResult> AddParticipant(int playerId, int tournamentId)
+    {
+        var tournament = await _tournamentService.AddParticipantAsync(playerId, tournamentId);
+        if (tournament is null) return BadRequest();
+        return Ok(tournament);
+    }
 
-        [HttpPut("AddParticipant")]
-        public async Task<Tournament> AddParticipant(int playerId, int tournamentId)
-        {
-            return await _tournamentService.AddParticipantAsync(playerId, tournamentId);
-        }
+    [HttpPut("RemoveParticipant")]
+    public async Task<IActionResult> RemoveParticipant(int playerId, int touramentId)
+    {
+        var tournament = await _tournamentService.RemoveParticipantAsync(playerId, touramentId);
+        if (tournament is null) return BadRequest();
+        return Ok(tournament);
+    }
 
-        [HttpPut("RemoveParticipant")]
-        public async Task<Tournament> RemoveParticipant(int playerId, int touramentId)
-        {
-            return await _tournamentService.RemoveParticipantAsync(playerId, touramentId);
-        }
+    [HttpPut("DeclineTournament")]
+    public async Task<IActionResult> DeclineTournament(int tournamentId)
+    {
+        var tournament = await _tournamentService.DeclineTournamentAsync(tournamentId);
+        if (tournament is null) return BadRequest();
+        return Ok(tournament);
+    }
 
-        [HttpDelete]
-        public async Task<Tournament> DeclineTournament(int tournamentId)
-        {
-            return await _tournamentService.DeclineTournamentAsync(tournamentId);
-        }
+    [HttpGet("GetAll")]
+    public async Task<List<Tournament>> GetAll(int pageNumber, int pageGize)
+    {
+        return await _tournamentService.GetTournamentsAsync(pageNumber, pageGize);
+    }
 
-        [HttpGet("GetAll")]
-        public async Task<List<Tournament>> GetAll(int pageNumber, int pageGize)
-        {
-            return await _tournamentService.GetTournamentsAsync(pageNumber, pageGize);
-        }
+    [HttpPut("CloseGroups")]
+    public async Task<IActionResult> CloseGroups(int tournamentId)
+    {
+        var tournament = await _tournamentService.CloseGroupsAsync(tournamentId);
+        if (tournament is null)
+            return BadRequest();
+        return Ok(tournament);
+    }
+    [HttpPut("CloseMatch")]
+    public async Task<IActionResult> CloseMatch(CloseMatchRequestDto dto)
+    {
+        var tournament = await _tournamentService.CloseMatchAsync(dto);
+        if (tournament is null)
+            return BadRequest();
+        return Ok(tournament);
+    }
 
-        [HttpPut("CloseGroups")]
-        public async Task<Tournament> CloseGroups(int tournamentId)
-        {
-            return await _tournamentService.CloseGroupsAsync(tournamentId);
-        }
-        [HttpPut("CloseMatch")]
-        public async Task<Tournament> CloseMatch(CloseMatchRequestDto dto)
-        {
-            return await _tournamentService.CloseMatchAsync(dto);
-        }
+    [HttpGet("GetTournamentByDisciplineName")]
+    public async Task<IActionResult> GetTournamentByDisciplineName(string name)
+    {
+        var tournaments = await _tournamentService.GetTournamentByDesciplineName(name);
+        if (tournaments is null) return BadRequest();
+        return Ok(tournaments);
+    }
+    [HttpGet("GetTournamentByName")]
+    public async Task<IActionResult> GetTournamentByName(string name)
+    {
+        var tournaments = await _tournamentService.GetTournamentByName(name);
+        if (tournaments is null) return BadRequest();
+        return Ok(tournaments);
     }
 }
+

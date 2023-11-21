@@ -12,14 +12,16 @@ namespace Tournonamemt.Services
         private readonly IGroupService _groupService;
         private readonly IBracketService _bracketService;
         private readonly IMatchRepository _matchRepository;
+        private readonly ITourRepository _tourRepository;
 
-        public TournamentService(ITournamentRepository tournamentRepository, IUserRepository userRepository, IGroupService groupService, IBracketService bracketService, IMatchRepository matchRepository)
+        public TournamentService(ITournamentRepository tournamentRepository, IUserRepository userRepository, IGroupService groupService, IBracketService bracketService, IMatchRepository matchRepository, ITourRepository tourRepository)
         {
             _tournamentRepository = tournamentRepository;
             _userRepository = userRepository;
             _groupService = groupService;
             _bracketService = bracketService;
             _matchRepository = matchRepository;
+            _tourRepository = tourRepository;
         }
 
         public async Task<Tournament?> AddParticipantAsync(int playerId, int tournamentId)
@@ -38,7 +40,7 @@ namespace Tournonamemt.Services
             tournament.Participants.Add(player);
             tournament.ParticipantNumber++;
 
-            await _tournamentRepository.SaveAsync(tournament);
+            await _tournamentRepository.Update(tournament);
 
             return tournament;
         }
@@ -57,10 +59,11 @@ namespace Tournonamemt.Services
 
             foreach (var score in request.ScoreList)
             {
-                var currentScore = match.Scores.FirstOrDefault(x => x.PlayerId == score.PlayerId);
-                if (currentScore is null) continue;
-                currentScore.Value = score.Score;
+                var player = await _userRepository.GetAsync(score.PlayerId);
+                if (player is null) return null;
+                match.Scores.Add(new Score { PlayerId = score.PlayerId, Value = score.Score, Player = player });
             }
+
             match.status = Models.Enums.MatchStatus.Finish;
 
             if (match.IsGroupStep == false)
@@ -68,13 +71,15 @@ namespace Tournonamemt.Services
                 await _bracketService.CalcCloseMatch(tournament, match);
             }
 
-            await _tournamentRepository.SaveAsync(tournament);
+            await _tournamentRepository.Update(tournament);
             return tournament;
         }
 
-        public async Task<Tournament> CreateTournamentAsync(TournamentCreateDto tournamentDto)
+        public async Task<Tournament?> CreateTournamentAsync(TournamentCreateDto tournamentDto)
         {
             var tournament = new Tournament(tournamentDto);
+            if (tournament.WithGroupStep && tournament.GroupNumber <= 0)
+                return null;
             await _tournamentRepository.SaveAsync(tournament);
             return tournament;
         }
@@ -85,8 +90,10 @@ namespace Tournonamemt.Services
             if (tournament is null)
                 return null;
 
+            if (tournament.Status == TournamentStatus.End)
+                return null;
             tournament.Status = TournamentStatus.Decline;
-            await _tournamentRepository.SaveAsync(tournament);
+            await _tournamentRepository.Update(tournament);
             return tournament;
         }
 
@@ -102,34 +109,33 @@ namespace Tournonamemt.Services
 
         public async Task<Tournament?> RemoveParticipantAsync(int playerId, int tournamentId)
         {
+
             var tournament = await _tournamentRepository.GetAsync(tournamentId);
-            if (tournament is null)
+            if (tournament is null || tournament.Status == TournamentStatus.Decline)
                 return null;
 
             var player = tournament.Participants.FirstOrDefault(x => x.Id == playerId);
             if (player is null)
                 return null;
 
-            if (tournament.ParticipantNumber >= tournament.ParticipantNumberMax)
-                return null;
             tournament.Participants.Remove(player);
             tournament.ParticipantNumber--;
-
-            await _tournamentRepository.SaveAsync(tournament);
-
+            if (tournament.ParticipantNumber < 0) tournament.ParticipantNumber = 0;
+            await _tournamentRepository.Update(tournament);
             return tournament;
         }
         public async Task<Tournament?> CloseParticipantRecruitmentAsync(int tournamentId)
         {
             var tournament = await _tournamentRepository.GetAsync(tournamentId);
 
-            if (tournament is null) return null;
+            if (tournament is null || tournament.Status == TournamentStatus.Decline) return null;
             if (tournament.Status == TournamentStatus.CloseRecruitment) return null;
 
             tournament.Status = TournamentStatus.CloseRecruitment;
             if (tournament.WithGroupStep)
             {
                 var participantCountLivingFromGroup = GetClosestPowerOf2(tournament.ParticipantNumber / tournament.GroupNumber.Value);
+                tournament.numberLeavingTheGroup = participantCountLivingFromGroup;
                 FillTournamentTours(tournament, participantCountLivingFromGroup * tournament.GroupNumber.Value);
                 FillGroupsOfPlayers(tournament, participantCountLivingFromGroup);
                 foreach (var group in tournament.Groups)
@@ -143,20 +149,20 @@ namespace Tournonamemt.Services
                 _bracketService.CreateBracketMatches(tournament);
             }
 
-            await _tournamentRepository.SaveAsync(tournament);
+            await _tournamentRepository.Update(tournament);
             return tournament;
         }
         public async Task<Tournament?> CloseGroupsAsync(int tournamentId)
         {
             var tournament = await _tournamentRepository.GetAsync(tournamentId);
-            if (tournament is null) return null;
+            if (tournament is null || tournament.Status == TournamentStatus.Decline) return null;
 
             if (tournament.Groups.Any(x => x.Matchs.Any(x => x.status != Models.Enums.MatchStatus.Finish)))
             {
                 return null;
             }
-            _groupService.CloseGroups(tournament);
-            await _tournamentRepository.SaveAsync(tournament);
+            await _groupService.CloseGroups(tournament);
+            await _tournamentRepository.Update(tournament);
             return tournament;
         }
 
@@ -187,6 +193,7 @@ namespace Tournonamemt.Services
         {
             var numberOfTour = GetTourNumberOfParticipants(participantNumber);
 
+            tournament.Bracket.TourNumber = numberOfTour;
             for (int i = 1; i <= numberOfTour; i++)
             {
                 tournament.Bracket.Tours.Add(new Tour { TourNumber = i });
@@ -216,9 +223,16 @@ namespace Tournonamemt.Services
                 counterParticipants += participantCountLivingFromGroup;
             }
             return tournament;
-
-
         }
 
+        public async Task<List<Tournament>> GetTournamentByDesciplineName(string name)
+        {
+            return await _tournamentRepository.GetByDesciplineName(name);
+        }
+
+        public async Task<List<Tournament>> GetTournamentByName(string name)
+        {
+            return await _tournamentRepository.GetTournamentByName(name);
+        }
     }
 }

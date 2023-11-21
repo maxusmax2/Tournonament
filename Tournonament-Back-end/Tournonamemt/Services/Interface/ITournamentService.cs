@@ -14,5 +14,7 @@ namespace Tournonamemt.Services.Interface
         Task<Tournament> CloseMatchAsync(CloseMatchRequestDto request);
         Task<Tournament?> CloseGroupsAsync(int tournamentId);
         Task<Tournament> CloseParticipantRecruitmentAsync(int tournamentId);
+        Task<List<Tournament>> GetTournamentByDesciplineName(string name);
+        Task<List<Tournament>> GetTournamentByName(string name);
     }
 }

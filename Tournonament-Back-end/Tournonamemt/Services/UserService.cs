@@ -18,16 +18,19 @@ namespace Tournonamemt.Services
 
         public async Task<User?> Create(UserCreateDto playerCreateDto)
         {
+            if (await _playerRepository.GetByLoginAsync(playerCreateDto.Login) is not null) return null;
             var user = new User(playerCreateDto);
+
             _registrationManager.Registration(user, user.Password);
 
-            _playerRepository.Save(user);
+            await _playerRepository.Save(user);
             return user;
         }
 
         public async Task<User?> Get(int playerId)
         {
-            return await _playerRepository.GetAsync(playerId);
+            var user = await _playerRepository.GetAsync(playerId);
+            return user;
         }
     }
 }

@@ -5,6 +5,6 @@ namespace Tournonamemt.Services.Interface
     public interface IGroupService
     {
         Group CreateGroupMatches(Group group);
-        Tournament CloseGroups(Tournament tournament);
+        Task<Tournament> CloseGroups(Tournament tournament);
     }
 }
