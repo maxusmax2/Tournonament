@@ -27,15 +27,15 @@ namespace Tournonamemt.Repository
                 .FirstOrDefaultAsync(x => x.Id == tournamentId);
         }
 
-        public async Task<List<Tournament>> GetByDesciplineName(string name)
+        public async Task<List<Tournament>> GetByDesciplineName(string name, int pageNumber, int pageGize)
         {
             var mathcedDiscipline = await _context.disciplines.Where(x => x.Name.Contains(name)).Select(x => x.Id).ToListAsync();
-            return await _context.tournaments.Where(x => mathcedDiscipline.Contains(x.DisciplineId)).ToListAsync();
+            return await _context.tournaments.Where(x => mathcedDiscipline.Contains(x.DisciplineId)).Skip(pageNumber * pageGize).Take(pageGize).ToListAsync();
         }
 
-        public async Task<List<Tournament>> GetTournamentByName(string name)
+        public async Task<List<Tournament>> GetTournamentByName(string name, int pageNumber, int pageGize)
         {
-            return await _context.tournaments.Where(x => x.Name.Contains(name)).ToListAsync();
+            return await _context.tournaments.Where(x => x.Name.Contains(name)).Skip(pageNumber * pageGize).Take(pageGize).ToListAsync();
         }
 
         public async Task<Tournament> SaveAsync(Tournament tournament)

@@ -25,7 +25,7 @@ namespace Tournonamemt.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(UserCreateDto dto)
+        public async Task<IActionResult> Create([FromForm] UserCreateDto dto)
         {
             var user = await _userService.Create(dto);
             if (user is null)

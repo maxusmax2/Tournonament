@@ -13,6 +13,7 @@
         public string Location { get; set; }
         public int DisciplineId { get; set; }
         public int? numberLeavingTheGroup { get; set; }
+        public IFormFile image { get; set; }
 
     }
 }

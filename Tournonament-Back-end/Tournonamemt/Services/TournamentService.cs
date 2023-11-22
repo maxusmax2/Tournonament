@@ -13,8 +13,9 @@ namespace Tournonamemt.Services
         private readonly IBracketService _bracketService;
         private readonly IMatchRepository _matchRepository;
         private readonly ITourRepository _tourRepository;
+        private readonly IFileService _fileService;
 
-        public TournamentService(ITournamentRepository tournamentRepository, IUserRepository userRepository, IGroupService groupService, IBracketService bracketService, IMatchRepository matchRepository, ITourRepository tourRepository)
+        public TournamentService(ITournamentRepository tournamentRepository, IUserRepository userRepository, IGroupService groupService, IBracketService bracketService, IMatchRepository matchRepository, ITourRepository tourRepository, IFileService fileService)
         {
             _tournamentRepository = tournamentRepository;
             _userRepository = userRepository;
@@ -22,6 +23,7 @@ namespace Tournonamemt.Services
             _bracketService = bracketService;
             _matchRepository = matchRepository;
             _tourRepository = tourRepository;
+            _fileService = fileService;
         }
 
         public async Task<Tournament?> AddParticipantAsync(int playerId, int tournamentId)
@@ -80,6 +82,7 @@ namespace Tournonamemt.Services
             var tournament = new Tournament(tournamentDto);
             if (tournament.WithGroupStep && tournament.GroupNumber <= 0)
                 return null;
+            tournament.ImageUrl = await _fileService.UploadTournamentImage(tournamentDto.image);
             await _tournamentRepository.SaveAsync(tournament);
             return tournament;
         }
@@ -225,14 +228,14 @@ namespace Tournonamemt.Services
             return tournament;
         }
 
-        public async Task<List<Tournament>> GetTournamentByDesciplineName(string name)
+        public async Task<List<Tournament>> GetTournamentByDesciplineName(string name, int pageNumber, int pageGize)
         {
-            return await _tournamentRepository.GetByDesciplineName(name);
+            return await _tournamentRepository.GetByDesciplineName(name, pageNumber, pageGize);
         }
 
-        public async Task<List<Tournament>> GetTournamentByName(string name)
+        public async Task<List<Tournament>> GetTournamentByName(string name, int pageNumber, int pageGize)
         {
-            return await _tournamentRepository.GetTournamentByName(name);
+            return await _tournamentRepository.GetTournamentByName(name, pageNumber, pageGize);
         }
     }
 }

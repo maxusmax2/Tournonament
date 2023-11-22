@@ -24,7 +24,7 @@ public class TournamentController : ControllerBase
         return Ok(tournament);
     }
     [HttpPost]
-    public async Task<IActionResult> Create(TournamentCreateDto dto)
+    public async Task<IActionResult> Create([FromForm] TournamentCreateDto dto)
     {
         var tournament = await _tournamentService.CreateTournamentAsync(dto);
         if (tournament is null) return BadRequest();
@@ -87,16 +87,16 @@ public class TournamentController : ControllerBase
     }
 
     [HttpGet("GetTournamentByDisciplineName")]
-    public async Task<IActionResult> GetTournamentByDisciplineName(string name)
+    public async Task<IActionResult> GetTournamentByDisciplineName(string name, int pageNumber, int pageGize)
     {
-        var tournaments = await _tournamentService.GetTournamentByDesciplineName(name);
+        var tournaments = await _tournamentService.GetTournamentByDesciplineName(name, pageNumber, pageGize);
         if (tournaments is null) return BadRequest();
         return Ok(tournaments);
     }
     [HttpGet("GetTournamentByName")]
-    public async Task<IActionResult> GetTournamentByName(string name)
+    public async Task<IActionResult> GetTournamentByName(string name, int pageNumber, int pageGize)
     {
-        var tournaments = await _tournamentService.GetTournamentByName(name);
+        var tournaments = await _tournamentService.GetTournamentByName(name, pageNumber, pageGize);
         if (tournaments is null) return BadRequest();
         return Ok(tournaments);
     }
