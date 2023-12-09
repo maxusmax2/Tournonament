@@ -1,39 +1,43 @@
-import { HelperText, TextInput } from 'react-native-paper'
-import { Controller } from 'react-hook-form'
-import { View } from 'react-native'
+import {HelperText, TextInput} from 'react-native-paper'
+import {Controller} from 'react-hook-form'
+import {View} from 'react-native'
 
 
-import { FormTextInputRoot, FormTextInputWrapper } from './FormTextInput.styles'
+import {FormTextInputRoot, FormTextInputWrapper} from './FormTextInput.styles'
 
-import type { FC } from 'react'
-import type { FormTextInputProps } from './FormTextInput.types'
+import type {FC} from 'react'
+import type {FormTextInputProps} from './FormTextInput.types'
 
 const FormTextInput: FC<FormTextInputProps> =
   ({
-    control,
-    defaultValue,
-    name,
-    placeholder,
-    icon,
-    multiline = false,
-    errorMessage = '',
-    inputType = 'default'
+     control,
+     defaultValue,
+     name,
+     placeholder,
+     icon,
+     descriptionBlockContent,
+     multiline = false,
+     errorMessage = '',
+     inputType = 'default',
+     secureTextEntry = false
    }) => (
     <View>
       <FormTextInputRoot>
         <Controller
           control={control}
-          render={({ field: { onChange, value, onBlur } }) => (
+          render={({field: {onChange, value, onBlur}}) => (
             <FormTextInputWrapper
-              multiline={multiline}
-              left={icon && <TextInput.Icon icon={icon} />}
               onChangeText={onChange}
               onBlur={onBlur}
               value={value}
-              placeholder={placeholder}
-              underlineColor={'transparent'}
-              activeUnderlineColor={'transparent'}
+              defaultValue={String(value)}
+              label={placeholder}
               keyboardType={inputType}
+              left={icon && <TextInput.Icon icon={icon}/>}
+              error={!!errorMessage}
+              underlineStyle={{display: 'none'}}
+              secureTextEntry={secureTextEntry}
+              multiline={multiline}
             />
           )}
           defaultValue={defaultValue || ''}

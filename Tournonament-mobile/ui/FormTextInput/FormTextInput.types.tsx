@@ -7,4 +7,5 @@ export type FormTextInputProps = FieldValues & {
   icon?: string
   multiline?:boolean
   inputType?:KeyboardType
+  secureTextEntry?:boolean
 }
