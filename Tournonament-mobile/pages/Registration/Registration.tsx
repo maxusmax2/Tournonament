@@ -14,29 +14,9 @@ import axios from "axios"
 import React, {useState,} from "react";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import * as ImagePicker from 'expo-image-picker';
+import * as SecureStore from 'expo-secure-store';
 const Registration = () => {
 
-  const [image, setImage] = useState<string|undefined>();
-  const [imageInfo,setImageInfo] = useState(null)
-
-  const pickImage = async () => {
-    // No permissions request is necessary for launching the image library
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
-
-    console.log(result);
-
-    if (!result.canceled) {
-      // @ts-ignore
-      setImage(result.assets[0].uri);
-      // @ts-ignore
-      setImageInfo(result.assets[0])
-    }
-  };
   // @ts-ignore
   const [date, setDate] = useState(new Date());
   const [show, setShow] = useState(false)
@@ -52,38 +32,28 @@ const Registration = () => {
   const navigation = useNavigation<NavigationScreensType>()
   const {handleSubmit, control} =
     useForm<RegistrationFormType>()
+
   const handlePress: SubmitHandler<RegistrationFormType> = (formData) => {
     //@ts-ignore
-    console.log( imageInfo.type)
-    let bodyFormData = new FormData()
-    bodyFormData.append("NickName",formData.NickName)
-    //@ts-ignore
-    bodyFormData.append("Birthday",date)
-    bodyFormData.append("AboutMe",formData.AboutMe)
-    bodyFormData.append("Password",formData.Password)
-    bodyFormData.append("Login",formData.Login)
-    bodyFormData.append("Role",'Player')
-    //@ts-ignore
-    const newImageUri =  "file:///" + imageInfo.uri.split("file:/").join("");
-    //@ts-ignore
-    bodyFormData.append("avatar", {uri:newImageUri ,type: mime.getType(newImageUri), name: newImageUri.split("/").pop()})
-    console.log(bodyFormData);
+    console.log({login: formData.Login, password: formData.Password,birthday:date.toDateString(),nickName:formData.NickName,role:"Player"})
+    axios.post(
+      `${url}/User`,
+      {login: formData.Login, password: formData.Password,birthday:date.toUTCString(),nickName:formData.NickName,role:"Player",aboutMe:formData.AboutMe}
+    ).then(async (response) =>
+    {
+      await SecureStore.setItemAsync("token",response.data.token)
 
-    fetch(`${url}/User`,{
-        method:"POST",
-        headers: { "Content-Type": "multipart/form-data", },
-        body: bodyFormData,
-        }
+      console.log("tokenStorage", await SecureStore.getItemAsync("token"))
+      await SecureStore.setItemAsync("user",JSON.stringify(response.data.user))
+      navigation.navigate("Bottom", {response: response.data.user})
+    })
 
-    ).then((response) => {
-
-      navigation.navigate("Bottom", {response: response.data})
-    }).catch(error=> console.log(error.message));
+      .catch(error=> console.log(error.message))
   }
-  const toRegistration = () => {
-    navigation.navigate("Registration");
+
+  const toAuth = () => {
+    navigation.navigate("Authorize");
   }
-  // @ts-ignore
   // @ts-ignore
   return (
     <QueryClientProvider client={queryClient}>
@@ -110,8 +80,6 @@ const Registration = () => {
           </Pressable>
           <FormTextInput name={"AboutMe"} placeholder={"О себе"} control={control} multiline={true}
                          icon="information" secureTextEntry/>
-          <Button contentStyle={styles.sumbmitButton} onPress={()=>pickImage()}>Загрузить фото</Button>
-          <UploadImage source={{uri:image}}/>
           <Button contentStyle={styles.sumbmitButton} onPress={handleSubmit(handlePress)}>Зарегистрироваться</Button>
         </View>
       </View>

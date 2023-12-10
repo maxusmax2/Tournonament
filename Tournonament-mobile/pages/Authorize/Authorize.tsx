@@ -14,6 +14,7 @@ import {
 import {NavigationScreensType} from '../../navigate/Navigate.type'
 import {url} from "../../constants"
 import {useNavigation} from "@react-navigation/native"
+import * as SecureStore from 'expo-secure-store';
 
 const Authorize = () => {
   const queryClient = new QueryClient()
@@ -24,10 +25,15 @@ const Authorize = () => {
     axios.post(
       `${url}/Auth`,
       {login: formData.login, password: formData.password}
-    ).then((response) => navigation.navigate("Bottom", {response: response.data}))
+    ).then(async (response) => {
+      await SecureStore.setItemAsync("token", response.data.token)
+      await SecureStore.setItemAsync("user", JSON.stringify(response.data.user));
+      navigation.navigate("Bottom", {response: response.data.user})
+    })
+
+      .catch(error => console.log(error.message))
   }
-  const toRegistration  = () =>
-  {
+  const toRegistration = () => {
     navigation.navigate("Registration");
   }
   return (

@@ -5,5 +5,5 @@ export type RegistrationFormType = {
     Password: string,
     Login: string,
     Role:string
-    avatar:File
+    avatar:any
 }

@@ -8,12 +8,12 @@ const Tab = createMaterialBottomTabNavigator();
 const HomeTab = ({route})=> {
     const { token, user } = route.params.response;
     return (
-        <Tab.Navigator >
+        <Tab.Navigator  barStyle={{ backgroundColor: '#343D4A' }}>
             <Tab.Screen
                 options={{
                     tabBarLabel: 'Home',
                     tabBarIcon: ({ color }) => (
-                        <MaterialCommunityIcons name="home" color={color} size={26} />
+                        <MaterialCommunityIcons name="home" color={color}  size={26} />
                     ),}}
                 name="Home"
                 component={Home}

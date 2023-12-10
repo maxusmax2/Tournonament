@@ -6,5 +6,6 @@ export type StackScreenList =
     Home: any
     Bottom: any
     Registration: undefined
+    TournamentDetails: any
 }
 export type NavigationScreensType = StackNavigationProp<StackScreenList>
