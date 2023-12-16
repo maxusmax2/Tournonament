@@ -21,6 +21,20 @@ namespace Tournonamemt.Repository
             return await _context.Users.FirstOrDefaultAsync(x => x.Login == login);
         }
 
+        public async Task<List<Match>> GetMatchies(int userId)
+        {
+            return await _context.matches
+                .Where(x => x.Participants.Any(x => x.Id == userId))
+                .ToListAsync();
+        }
+
+        public async Task<List<Tournament>> GetTournaments(int userId)
+        {
+            return await _context.tournaments
+               .Where(x => x.Participants.Any(x => x.Id == userId))
+               .ToListAsync();
+        }
+
         public async Task<User> Save(User player)
         {
             await _context.Users.AddAsync(player);

@@ -7,5 +7,6 @@ namespace Tournonamemt.Repository.Interface
         Task<Tour?> GetAsync(int tourId);
         Task<Tour> Save(Tour tour);
         Task Update(Tour tour);
+        Task<List<Tour>?> GetTournamentsToursAsync(int tournamentId);
     }
 }

@@ -7,5 +7,7 @@ namespace Tournonamemt.Services.Interface
     {
         Task<User?> Get(int playerId);
         Task<User?> Create(UserCreateDto playerCreateDto);
+        Task<List<Match>> GetMatchies(int userId);
+        Task<List<Tournament>> GetTournaments(int userId);
     }
 }

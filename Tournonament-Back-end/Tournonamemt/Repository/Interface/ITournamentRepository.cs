@@ -9,6 +9,7 @@ namespace Tournonamemt.Repository.Interface
         Task<List<Tournament>> GetAllAsync(int pageNumber, int pageSize);
         Task Update(Tournament tournament);
         Task<List<Tournament>> GetByDesciplineName(string name, int pageNumber, int pageGize);
-        Task<List<Tournament>> GetTournamentByName(string name, int pageNumber, int pageGize);
+        Task<List<Tournament>> Search(string name, int pageNumber, int pageGize);
+
     }
 }

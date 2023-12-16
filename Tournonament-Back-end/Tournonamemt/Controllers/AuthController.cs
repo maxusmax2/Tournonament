@@ -14,7 +14,7 @@ public class AuthController : ControllerBase
         _authorizationService = authorizationService;
     }
 
-    [HttpPost("Auth")]
+    [HttpPost]
     public async Task<IActionResult> Auth([FromBody] AuthRequest request)
     {
         var response = await _authorizationService.Authenticate(request.login, request.password);

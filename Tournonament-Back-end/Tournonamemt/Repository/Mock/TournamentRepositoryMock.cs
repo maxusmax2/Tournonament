@@ -39,7 +39,7 @@ namespace Tournonamemt.Repository.Mock
             }
             storage[tournament.Id] = tournament;
 
-            foreach (var tours in tournament.Bracket.Tours)
+            foreach (var tours in tournament.Tours)
             {
                 foreach (var match in tours.Matches)
                 {

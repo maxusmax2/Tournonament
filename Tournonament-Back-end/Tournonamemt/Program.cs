@@ -31,6 +31,7 @@ builder.Services.AddScoped<IBracketService, BracketService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IGroupService, GroupService>();
 builder.Services.AddScoped<IFileService, FileService>();
+builder.Services.AddScoped<IMatchService, MatchService>();
 builder.Services.AddScoped<IAuthorizationService, AuthorizationService>();
 builder.Services.AddScoped<IMatchRepository, MatchRepository>();
 builder.Services.AddScoped<ITournamentRepository, TournamentRepository>();

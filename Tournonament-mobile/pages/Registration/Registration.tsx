@@ -7,13 +7,11 @@ import {useNavigation} from "@react-navigation/native"
 import {NavigationScreensType} from '../../navigate/Navigate.type'
 import {QueryClient, QueryClientProvider} from "react-query"
 import FormTextInput from "../../ui/FormTextInput/FormTextInput"
-import mime from "mime"
 import {SubmitHandler, useForm} from "react-hook-form"
 import {RegistrationFormType} from "./Registration.types"
 import axios from "axios"
 import React, {useState,} from "react";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import * as ImagePicker from 'expo-image-picker';
 import * as SecureStore from 'expo-secure-store';
 const Registration = () => {
 

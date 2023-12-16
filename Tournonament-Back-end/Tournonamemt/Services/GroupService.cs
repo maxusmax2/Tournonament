@@ -45,6 +45,7 @@ namespace Tournonamemt.Services
                 groups.Add(await _groupRepository.GetAsync(group.Id));
 
             }
+
             var PlayersInGroupByScore = groups
                 .ToDictionary(g => g.GroupNumber,
                             g => g.Participants
@@ -54,7 +55,7 @@ namespace Tournonamemt.Services
                             .Select((p, i) => new { p, i })
                             .ToDictionary(x => x.i, x => x.p));
 
-            var tour = await _tourRepository.GetAsync(tournament.Bracket.Tours.FirstOrDefault(x => x.TourNumber == 1).Id);
+            var tour = await _tourRepository.GetAsync(tournament.Tours.FirstOrDefault(x => x.TourNumber == 1).Id);
             var matchCounter = 0;
             for (int i = 1; i < tournament.GroupNumber; i += 2)
             {
@@ -71,14 +72,9 @@ namespace Tournonamemt.Services
             return tournament;
         }
 
-        private int GetClosestPowerOf2(int number)
+        public async Task<List<Group>> GetTournamentsGroupsAsync(int tournamentId)
         {
-            int powerOf2 = 1;
-            while (powerOf2 < number)
-            {
-                powerOf2 = powerOf2 << 1; // shift 'powerOf2' left by 1 bit
-            }
-            return powerOf2;
+            return await _groupRepository.GetTournamentsGroupsAsync(tournamentId);
         }
     }
 }

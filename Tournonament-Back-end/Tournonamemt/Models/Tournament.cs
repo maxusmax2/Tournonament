@@ -20,14 +20,15 @@ namespace Tournonamemt.Models
         public List<Group> Groups { get; set; }
         public string Location { get; set; }
         public string? ImageUrl { get; set; }
-        public int DisciplineId { get; set; }
-        public Discipline Discipline { get; set; }
-        public int BracketId { get; set; }
-        public Bracket Bracket { get; set; }
+
+        public string Discipline { get; set; }
+        public int CreatorId { get; set; }
         public int? WinnerId { get; set; }
         [NotMapped]
         public User? Winner { get; set; }
         public List<User> Participants { get; set; }
+        public int TourNumber { get; set; }
+        public List<Tour> Tours { get; set; }
 
 
         public Tournament() { }
@@ -35,7 +36,8 @@ namespace Tournonamemt.Models
         {
             Name = tournamentCreateDto.Name;
             Date = tournamentCreateDto.Date;
-            numberLeavingTheGroup = tournamentCreateDto.numberLeavingTheGroup;
+            CreatorId = tournamentCreateDto.CreatorId;
+            numberLeavingTheGroup = tournamentCreateDto.NumberLeavingTheGroup;
             ParticipantNumber = 0;
             ParticipantNumberMax = tournamentCreateDto.ParticipantNumberMax;
             PrizeFund = tournamentCreateDto.PrizeFund;
@@ -45,9 +47,8 @@ namespace Tournonamemt.Models
             WithGroupStep = tournamentCreateDto.WithGroupStep;
             GroupNumber = tournamentCreateDto.GroupNumber;
             Location = tournamentCreateDto.Location;
-            DisciplineId = tournamentCreateDto.DisciplineId;
+            Discipline = tournamentCreateDto.Discipline;
             Participants = new();
-            Bracket = new();
             if (WithGroupStep)
             {
                 Groups = new();

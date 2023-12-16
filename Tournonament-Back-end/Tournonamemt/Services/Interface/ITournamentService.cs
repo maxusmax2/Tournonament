@@ -12,9 +12,9 @@ namespace Tournonamemt.Services.Interface
         Task<Tournament> AddParticipantAsync(int playerId, int tournamentId);
         Task<Tournament> RemoveParticipantAsync(int playerId, int tournamentId);
         Task<Tournament> CloseMatchAsync(CloseMatchRequestDto request);
-        Task<Tournament?> CloseGroupsAsync(int tournamentId);
         Task<Tournament> CloseParticipantRecruitmentAsync(int tournamentId);
-        Task<List<Tournament>> GetTournamentByDesciplineName(string name, int pageNumber, int pageGize);
-        Task<List<Tournament>> GetTournamentByName(string name, int pageNumber, int pageGize);
+        Task<Tournament?> CloseGroupsAsync(int tournamentId);
+        Task<List<Tournament>> Search(string name, int pageNumber, int pageGize);
+        Task<List<Tour>?> GetTournamentsToursAsync(int tournamentId);
     }
 }

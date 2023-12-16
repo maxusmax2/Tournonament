@@ -6,5 +6,6 @@ namespace Tournonamemt.Services.Interface
     {
         Group CreateGroupMatches(Group group);
         Task<Tournament> CloseGroups(Tournament tournament);
+        Task<List<Group>> GetTournamentsGroupsAsync(int tournamentId);
     }
 }

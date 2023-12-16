@@ -13,7 +13,7 @@ namespace Tournonamemt.Services
         }
         public Tournament CreateBracketMatches(Tournament tournament)
         {
-            var firstTour = tournament.Bracket.Tours.First(x => x.TourNumber == 1);
+            var firstTour = tournament.Tours.First(x => x.TourNumber == 1);
 
             var playerCounter = 0;
             foreach (var match in firstTour.Matches)
@@ -30,7 +30,7 @@ namespace Tournonamemt.Services
         {
             if (tournament.Format == TournamentFormat.Knockout)
             {
-                await CalcKnockout(tournament.Bracket, match);
+                await CalcKnockout(tournament, match);
             }
             else if (tournament.Format == TournamentFormat.DoubleElimination)
             {
@@ -40,17 +40,17 @@ namespace Tournonamemt.Services
             return true;
         }
 
-        private async Task<bool> CalcKnockout(Bracket bracket, Match match)
+        private async Task<bool> CalcKnockout(Tournament tournament, Match match)
         {
             var winner = match.Scores.MaxBy(x => x.Value)?.Player;
             var currentTour = match.Tour.TourNumber;
-            if (bracket.TourNumber == currentTour)
+            if (tournament.TourNumber == currentTour)
             {
-                bracket.Tournament.Winner = winner;
+                tournament.Winner = winner;
                 return true;
             }
             var nextMatchNumber = Math.Ceiling(match.Number / 2.0);
-            var nextTour = await _tourRepository.GetAsync(bracket.Tours.FirstOrDefault(x => x.TourNumber == currentTour + 1).Id);
+            var nextTour = await _tourRepository.GetAsync(tournament.Tours.FirstOrDefault(x => x.TourNumber == currentTour + 1).Id);
 
             var nextMatch = nextTour.Matches.FirstOrDefault(x => x.Number == nextMatchNumber);
             nextMatch.Participants.Add(winner);

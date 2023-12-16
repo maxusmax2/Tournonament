@@ -4,4 +4,5 @@
     End = 1,
     Decline = 2,
     CloseRecruitment = 3,
+    OnPlayOff = 4
 }

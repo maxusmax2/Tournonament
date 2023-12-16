@@ -9,11 +9,14 @@ namespace Tournonamemt.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
+        private readonly IAuthorizationService _authorizationService;
 
-        public UserController(IUserService userService)
+        public UserController(IUserService userService, IAuthorizationService authorizationService)
         {
             _userService = userService;
+            _authorizationService = authorizationService;
         }
+
         [HttpGet]
         public async Task<IActionResult> Get(int userId)
         {
@@ -25,14 +28,32 @@ namespace Tournonamemt.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromForm] UserCreateDto dto)
+        public async Task<IActionResult> Create([FromBody] UserCreateDto dto)
         {
             var user = await _userService.Create(dto);
             if (user is null)
                 return BadRequest();
+            var response = await _authorizationService.Authenticate(dto.Login, dto.Password);
+            return Ok(response);
+        }
+        [HttpGet("GetMatchies/{userId}")]
+        public async Task<IActionResult> GetMatchies(int userId)
+        {
+            var matches = await _userService.GetMatchies(userId);
+            if (matches is null)
+                return NotFound();
 
-            return Ok(user);
+            return Ok(matches);
+        }
 
+        [HttpGet("GetTournament/{userId}")]
+        public async Task<IActionResult> GetTournament(int userId)
+        {
+            var tournaments = await _userService.GetTournaments(userId);
+            if (tournaments is null)
+                return NotFound();
+
+            return Ok(tournaments);
         }
     }
 }

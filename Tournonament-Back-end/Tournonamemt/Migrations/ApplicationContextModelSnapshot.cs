@@ -21,20 +21,49 @@ namespace Tournonamemt.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
-            modelBuilder.Entity("Tournonamemt.Models.Bracket", b =>
+            modelBuilder.Entity("GroupUser", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
+                    b.Property<int>("GroupsId")
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<int>("TourNumber")
+                    b.Property<int>("ParticipantsId")
                         .HasColumnType("int");
 
-                    b.HasKey("Id");
+                    b.HasKey("GroupsId", "ParticipantsId");
 
-                    b.ToTable("brackets");
+                    b.HasIndex("ParticipantsId");
+
+                    b.ToTable("GroupUser");
+                });
+
+            modelBuilder.Entity("MatchUser", b =>
+                {
+                    b.Property<int>("MatchesId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ParticipantsId")
+                        .HasColumnType("int");
+
+                    b.HasKey("MatchesId", "ParticipantsId");
+
+                    b.HasIndex("ParticipantsId");
+
+                    b.ToTable("MatchUser");
+                });
+
+            modelBuilder.Entity("TournamentUser", b =>
+                {
+                    b.Property<int>("ParticipantsId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TournamentsId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ParticipantsId", "TournamentsId");
+
+                    b.HasIndex("TournamentsId");
+
+                    b.ToTable("TournamentUser");
                 });
 
             modelBuilder.Entity("Tournonamemt.Models.Discipline", b =>
@@ -167,9 +196,6 @@ namespace Tournonamemt.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<int?>("BracketId")
-                        .HasColumnType("int");
-
                     b.Property<int>("MatchNumber")
                         .HasColumnType("int");
 
@@ -179,9 +205,12 @@ namespace Tournonamemt.Migrations
                     b.Property<int>("TourNumber")
                         .HasColumnType("int");
 
+                    b.Property<int>("TournamentId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("BracketId");
+                    b.HasIndex("TournamentId");
 
                     b.ToTable("tours");
                 });
@@ -193,9 +222,6 @@ namespace Tournonamemt.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<int>("BracketId")
-                        .HasColumnType("int");
 
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
@@ -236,16 +262,19 @@ namespace Tournonamemt.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
+                    b.Property<int>("TourNumber")
+                        .HasColumnType("int");
+
                     b.Property<int?>("WinnerId")
                         .HasColumnType("int");
 
                     b.Property<bool>("WithGroupStep")
                         .HasColumnType("bit");
 
-                    b.HasKey("Id");
+                    b.Property<int?>("numberLeavingTheGroup")
+                        .HasColumnType("int");
 
-                    b.HasIndex("BracketId")
-                        .IsUnique();
+                    b.HasKey("Id");
 
                     b.HasIndex("DisciplineId");
 
@@ -269,18 +298,12 @@ namespace Tournonamemt.Migrations
                     b.Property<DateTime>("Birthday")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("GroupId")
-                        .HasColumnType("int");
-
                     b.Property<string>("ImageUrl")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Login")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("MatchId")
-                        .HasColumnType("int");
 
                     b.Property<string>("NickName")
                         .IsRequired()
@@ -294,23 +317,69 @@ namespace Tournonamemt.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("TourId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("TournamentId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("GroupId");
-
-                    b.HasIndex("MatchId");
-
-                    b.HasIndex("TourId");
-
-                    b.HasIndex("TournamentId");
-
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("TourUser", b =>
+                {
+                    b.Property<int>("ParticipantsId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ToursId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ParticipantsId", "ToursId");
+
+                    b.HasIndex("ToursId");
+
+                    b.ToTable("TourUser");
+                });
+
+            modelBuilder.Entity("GroupUser", b =>
+                {
+                    b.HasOne("Tournonamemt.Models.Group", null)
+                        .WithMany()
+                        .HasForeignKey("GroupsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Tournonamemt.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("ParticipantsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("MatchUser", b =>
+                {
+                    b.HasOne("Tournonamemt.Models.Match", null)
+                        .WithMany()
+                        .HasForeignKey("MatchesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Tournonamemt.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("ParticipantsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("TournamentUser", b =>
+                {
+                    b.HasOne("Tournonamemt.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("ParticipantsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Tournonamemt.Models.Tournament", null)
+                        .WithMany()
+                        .HasForeignKey("TournamentsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Tournonamemt.Models.Group", b =>
@@ -362,19 +431,17 @@ namespace Tournonamemt.Migrations
 
             modelBuilder.Entity("Tournonamemt.Models.Tour", b =>
                 {
-                    b.HasOne("Tournonamemt.Models.Bracket", null)
+                    b.HasOne("Tournonamemt.Models.Tournament", "Tournament")
                         .WithMany("Tours")
-                        .HasForeignKey("BracketId");
+                        .HasForeignKey("TournamentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Tournament");
                 });
 
             modelBuilder.Entity("Tournonamemt.Models.Tournament", b =>
                 {
-                    b.HasOne("Tournonamemt.Models.Bracket", "Bracket")
-                        .WithOne("Tournament")
-                        .HasForeignKey("Tournonamemt.Models.Tournament", "BracketId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Tournonamemt.Models.Discipline", "Discipline")
                         .WithMany()
                         .HasForeignKey("DisciplineId")
@@ -382,69 +449,54 @@ namespace Tournonamemt.Migrations
                         .IsRequired();
 
                     b.HasOne("Tournonamemt.Models.User", "Winner")
-                        .WithMany()
+                        .WithMany("WinTournaments")
                         .HasForeignKey("WinnerId");
-
-                    b.Navigation("Bracket");
 
                     b.Navigation("Discipline");
 
                     b.Navigation("Winner");
                 });
 
-            modelBuilder.Entity("Tournonamemt.Models.User", b =>
+            modelBuilder.Entity("TourUser", b =>
                 {
-                    b.HasOne("Tournonamemt.Models.Group", null)
-                        .WithMany("Participants")
-                        .HasForeignKey("GroupId");
-
-                    b.HasOne("Tournonamemt.Models.Match", null)
-                        .WithMany("Participants")
-                        .HasForeignKey("MatchId");
-
-                    b.HasOne("Tournonamemt.Models.Tour", null)
-                        .WithMany("Participants")
-                        .HasForeignKey("TourId");
-
-                    b.HasOne("Tournonamemt.Models.Tournament", null)
-                        .WithMany("Participants")
-                        .HasForeignKey("TournamentId");
-                });
-
-            modelBuilder.Entity("Tournonamemt.Models.Bracket", b =>
-                {
-                    b.Navigation("Tournament")
+                    b.HasOne("Tournonamemt.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("ParticipantsId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Tours");
+                    b.HasOne("Tournonamemt.Models.Tour", null)
+                        .WithMany()
+                        .HasForeignKey("ToursId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Tournonamemt.Models.Group", b =>
                 {
                     b.Navigation("Matchs");
-
-                    b.Navigation("Participants");
                 });
 
             modelBuilder.Entity("Tournonamemt.Models.Match", b =>
                 {
-                    b.Navigation("Participants");
-
                     b.Navigation("Scores");
                 });
 
             modelBuilder.Entity("Tournonamemt.Models.Tour", b =>
                 {
                     b.Navigation("Matches");
-
-                    b.Navigation("Participants");
                 });
 
             modelBuilder.Entity("Tournonamemt.Models.Tournament", b =>
                 {
                     b.Navigation("Groups");
 
-                    b.Navigation("Participants");
+                    b.Navigation("Tours");
+                });
+
+            modelBuilder.Entity("Tournonamemt.Models.User", b =>
+                {
+                    b.Navigation("WinTournaments");
                 });
 #pragma warning restore 612, 618
         }

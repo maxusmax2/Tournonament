@@ -13,7 +13,6 @@ namespace Tournonamemt.Services
         private readonly IBracketService _bracketService;
         private readonly IMatchRepository _matchRepository;
         private readonly ITourRepository _tourRepository;
-        private readonly IFileService _fileService;
 
         public TournamentService(ITournamentRepository tournamentRepository, IUserRepository userRepository, IGroupService groupService, IBracketService bracketService, IMatchRepository matchRepository, ITourRepository tourRepository, IFileService fileService)
         {
@@ -23,7 +22,6 @@ namespace Tournonamemt.Services
             _bracketService = bracketService;
             _matchRepository = matchRepository;
             _tourRepository = tourRepository;
-            _fileService = fileService;
         }
 
         public async Task<Tournament?> AddParticipantAsync(int playerId, int tournamentId)
@@ -53,11 +51,11 @@ namespace Tournonamemt.Services
             if (tournament is null) return null;
 
             var match = await _matchRepository.GetAsync(request.MatchId);
+            if (match is null) return null;
             if (match.status == Models.Enums.MatchStatus.Finish)
             {
                 return null;
             }
-            if (match is null) return null;
 
             foreach (var score in request.ScoreList)
             {
@@ -74,6 +72,7 @@ namespace Tournonamemt.Services
             }
 
             await _tournamentRepository.Update(tournament);
+
             return tournament;
         }
 
@@ -82,7 +81,6 @@ namespace Tournonamemt.Services
             var tournament = new Tournament(tournamentDto);
             if (tournament.WithGroupStep && tournament.GroupNumber <= 0)
                 return null;
-            tournament.ImageUrl = await _fileService.UploadTournamentImage(tournamentDto.image);
             await _tournamentRepository.SaveAsync(tournament);
             return tournament;
         }
@@ -134,7 +132,7 @@ namespace Tournonamemt.Services
             if (tournament is null || tournament.Status == TournamentStatus.Decline) return null;
             if (tournament.Status == TournamentStatus.CloseRecruitment) return null;
 
-            tournament.Status = TournamentStatus.CloseRecruitment;
+            tournament.Status = tournament.WithGroupStep ? TournamentStatus.CloseRecruitment : TournamentStatus.OnPlayOff;
             if (tournament.WithGroupStep)
             {
                 var participantCountLivingFromGroup = GetClosestPowerOf2(tournament.ParticipantNumber / tournament.GroupNumber.Value);
@@ -164,6 +162,7 @@ namespace Tournonamemt.Services
             {
                 return null;
             }
+            tournament.Status = TournamentStatus.OnPlayOff;
             await _groupService.CloseGroups(tournament);
             await _tournamentRepository.Update(tournament);
             return tournament;
@@ -196,14 +195,14 @@ namespace Tournonamemt.Services
         {
             var numberOfTour = GetTourNumberOfParticipants(participantNumber);
 
-            tournament.Bracket.TourNumber = numberOfTour;
+            tournament.TourNumber = numberOfTour;
             for (int i = 1; i <= numberOfTour; i++)
             {
-                tournament.Bracket.Tours.Add(new Tour { TourNumber = i });
+                tournament.Tours.Add(new Tour { TourNumber = i });
             }
 
             var matchCountInTour = participantNumber / 2;
-            foreach (var tour in tournament.Bracket.Tours)
+            foreach (var tour in tournament.Tours)
             {
                 tour.Matches = new();
                 tour.MatchNumber = matchCountInTour;
@@ -233,9 +232,14 @@ namespace Tournonamemt.Services
             return await _tournamentRepository.GetByDesciplineName(name, pageNumber, pageGize);
         }
 
-        public async Task<List<Tournament>> GetTournamentByName(string name, int pageNumber, int pageGize)
+        public async Task<List<Tournament>> Search(string name, int pageNumber, int pageGize)
         {
-            return await _tournamentRepository.GetTournamentByName(name, pageNumber, pageGize);
+            return await _tournamentRepository.Search(name, pageNumber, pageGize);
+        }
+
+        public async Task<List<Tour>?> GetTournamentsToursAsync(int tournamentId)
+        {
+            return await _tourRepository.GetTournamentsToursAsync(tournamentId);
         }
     }
 }

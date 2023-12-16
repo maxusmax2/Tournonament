@@ -12,7 +12,15 @@ namespace Tournonamemt.Repository
         {
             _context = context;
         }
+        public async Task<List<Tour>?> GetTournamentsToursAsync(int tournamentId)
+        {
+            return await _context.tours
+                .Include(x => x.Matches)
+                .Include(x => x.Participants)
+                .Where(x => x.TournamentId == tournamentId)
+                .ToListAsync();
 
+        }
         public async Task<Tour?> GetAsync(int tourId)
         {
             return await _context.tours

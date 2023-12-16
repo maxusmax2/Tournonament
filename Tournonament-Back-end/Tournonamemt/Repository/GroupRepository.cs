@@ -20,5 +20,14 @@ namespace Tournonamemt.Repository
                 .Include(x => x.Matchs)
                 .FirstAsync(x => x.Id == groupId);
         }
+
+        public async Task<List<Group>> GetTournamentsGroupsAsync(int tournamentId)
+        {
+            return await _context.groups
+                .Include(x => x.Participants)
+                .Include(x => x.Matchs)
+                .Where(x=> x.TournamentId == tournamentId)
+                .ToListAsync();
+        }
     }
 }

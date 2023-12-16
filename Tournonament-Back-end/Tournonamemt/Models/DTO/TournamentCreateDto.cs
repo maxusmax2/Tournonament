@@ -11,9 +11,9 @@
         public bool WithGroupStep { get; set; }
         public int? GroupNumber { get; set; }
         public string Location { get; set; }
-        public int DisciplineId { get; set; }
-        public int? numberLeavingTheGroup { get; set; }
-        public IFormFile image { get; set; }
+        public string Discipline { get; set; }
+        public int? NumberLeavingTheGroup { get; set; }
+        public int CreatorId { get; set; }
 
     }
 }

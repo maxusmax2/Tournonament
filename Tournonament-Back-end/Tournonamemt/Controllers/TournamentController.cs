@@ -10,10 +10,12 @@ namespace Tournonamemt.Controllers;
 public class TournamentController : ControllerBase
 {
     private readonly ITournamentService _tournamentService;
+    private readonly IGroupService _groupService;
 
-    public TournamentController(ITournamentService tournamentService)
+    public TournamentController(ITournamentService tournamentService, IGroupService groupService)
     {
         _tournamentService = tournamentService;
+        _groupService = groupService;
     }
 
     [HttpGet]
@@ -24,7 +26,7 @@ public class TournamentController : ControllerBase
         return Ok(tournament);
     }
     [HttpPost]
-    public async Task<IActionResult> Create([FromForm] TournamentCreateDto dto)
+    public async Task<IActionResult> Create([FromBody] TournamentCreateDto dto)
     {
         var tournament = await _tournamentService.CreateTournamentAsync(dto);
         if (tournament is null) return BadRequest();
@@ -69,14 +71,6 @@ public class TournamentController : ControllerBase
         return await _tournamentService.GetTournamentsAsync(pageNumber, pageGize);
     }
 
-    [HttpPut("CloseGroups")]
-    public async Task<IActionResult> CloseGroups(int tournamentId)
-    {
-        var tournament = await _tournamentService.CloseGroupsAsync(tournamentId);
-        if (tournament is null)
-            return BadRequest();
-        return Ok(tournament);
-    }
     [HttpPut("CloseMatch")]
     public async Task<IActionResult> CloseMatch(CloseMatchRequestDto dto)
     {
@@ -85,20 +79,37 @@ public class TournamentController : ControllerBase
             return BadRequest();
         return Ok(tournament);
     }
-
-    [HttpGet("GetTournamentByDisciplineName")]
-    public async Task<IActionResult> GetTournamentByDisciplineName(string name, int pageNumber, int pageGize)
+    [HttpPut("CloseGroups")]
+    public async Task<IActionResult> CloseGroups(int tournamentId)
     {
-        var tournaments = await _tournamentService.GetTournamentByDesciplineName(name, pageNumber, pageGize);
+        var tournament = await _tournamentService.CloseGroupsAsync(tournamentId);
+        if (tournament is null)
+            return BadRequest();
+        return Ok(tournament);
+    }
+
+
+    [HttpGet("Search")]
+    public async Task<IActionResult> GetTournamentByName(string name, int pageNumber, int pageGize)
+    {
+        var tournaments = await _tournamentService.Search(name, pageNumber, pageGize);
         if (tournaments is null) return BadRequest();
         return Ok(tournaments);
     }
-    [HttpGet("GetTournamentByName")]
-    public async Task<IActionResult> GetTournamentByName(string name, int pageNumber, int pageGize)
+
+    [HttpGet("GetTournamentsTours")]
+    public async Task<IActionResult> GetTournamentsTours(int tournamentId)
     {
-        var tournaments = await _tournamentService.GetTournamentByName(name, pageNumber, pageGize);
-        if (tournaments is null) return BadRequest();
-        return Ok(tournaments);
+        var tours = await _tournamentService.GetTournamentsToursAsync(tournamentId);
+        if (tours is null) return BadRequest();
+        return Ok(tours);
+    }
+    [HttpGet("GetTournamentsGroups/{tournamentId}")]
+    public async Task<IActionResult> GetTournamentsGroups(int tournamentId)
+    {
+        var groups = await _groupService.GetTournamentsGroupsAsync(tournamentId);
+        if (groups is null) return BadRequest();
+        return Ok(groups);
     }
 }
 
