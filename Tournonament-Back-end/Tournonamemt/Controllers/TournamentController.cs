@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Tournonamemt.Models;
 using Tournonamemt.Models.DTO;
 using Tournonamemt.Services.Interface;
@@ -26,6 +27,7 @@ public class TournamentController : ControllerBase
         return Ok(tournament);
     }
     [HttpPost]
+    [Authorize(Roles = "Player,Admin")]
     public async Task<IActionResult> Create([FromBody] TournamentCreateDto dto)
     {
         var tournament = await _tournamentService.CreateTournamentAsync(dto);
@@ -34,6 +36,7 @@ public class TournamentController : ControllerBase
     }
 
     [HttpPut("CloseRecruitment")]
+    [Authorize(Roles = "Player")]
     public async Task<IActionResult> CloseRecruitment(int tournamentId)
     {
         var tournament = await _tournamentService.CloseParticipantRecruitmentAsync(tournamentId);
@@ -42,6 +45,7 @@ public class TournamentController : ControllerBase
     }
 
     [HttpPut("AddParticipant")]
+    [Authorize(Roles = "Player")]
     public async Task<IActionResult> AddParticipant(int playerId, int tournamentId)
     {
         var tournament = await _tournamentService.AddParticipantAsync(playerId, tournamentId);
@@ -50,6 +54,7 @@ public class TournamentController : ControllerBase
     }
 
     [HttpPut("RemoveParticipant")]
+    [Authorize(Roles = "Player,Admin")]
     public async Task<IActionResult> RemoveParticipant(int playerId, int touramentId)
     {
         var tournament = await _tournamentService.RemoveParticipantAsync(playerId, touramentId);
@@ -58,6 +63,7 @@ public class TournamentController : ControllerBase
     }
 
     [HttpPut("DeclineTournament")]
+    [Authorize(Roles = "Player,Admin")]
     public async Task<IActionResult> DeclineTournament(int tournamentId)
     {
         var tournament = await _tournamentService.DeclineTournamentAsync(tournamentId);
@@ -72,6 +78,7 @@ public class TournamentController : ControllerBase
     }
 
     [HttpPut("CloseMatch")]
+    [Authorize(Roles = "Player")]
     public async Task<IActionResult> CloseMatch(CloseMatchRequestDto dto)
     {
         var tournament = await _tournamentService.CloseMatchAsync(dto);
@@ -79,7 +86,9 @@ public class TournamentController : ControllerBase
             return BadRequest();
         return Ok(tournament);
     }
+
     [HttpPut("CloseGroups")]
+    [Authorize(Roles = "Player")]
     public async Task<IActionResult> CloseGroups(int tournamentId)
     {
         var tournament = await _tournamentService.CloseGroupsAsync(tournamentId);
@@ -104,6 +113,7 @@ public class TournamentController : ControllerBase
         if (tours is null) return BadRequest();
         return Ok(tours);
     }
+
     [HttpGet("GetTournamentsGroups/{tournamentId}")]
     public async Task<IActionResult> GetTournamentsGroups(int tournamentId)
     {
