@@ -10,9 +10,10 @@ public class ApplicationContext : DbContext
     public DbSet<Match> matches { get; set; } = null!;
     public DbSet<Group> groups { get; set; } = null!;
     public DbSet<Discipline> disciplines { get; set; } = null!;
-    public ApplicationContext(DbContextOptions<ApplicationContext> options) : base(options)
+    private readonly IConfiguration _configuration;
+    public ApplicationContext(DbContextOptions<ApplicationContext> options, IConfiguration configuration) : base(options)
     {
-        //Database.EnsureDeleted();
+        _configuration = configuration;
         Database.EnsureCreated();
     }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -39,6 +40,6 @@ public class ApplicationContext : DbContext
     }
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.UseSqlServer(@"Server=BMO\SQLEXPRESS01;Database=tournonament;Trusted_Connection=True;");
+        optionsBuilder.UseSqlServer(_configuration.GetConnectionString("DefaultConnection"));
     }
 }

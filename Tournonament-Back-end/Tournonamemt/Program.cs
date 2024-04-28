@@ -39,9 +39,9 @@ builder.Services.AddScoped<ITourRepository, TourRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IGroupRepository, GroupRepository>();
 builder.Services.AddScoped<IRegistrationManager, RegistrationManager>();
+builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
 
 builder.Services.AddDbContext<ApplicationContext>();
-
 builder.Services.AddAuthentication(x =>
 {
     x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -64,7 +64,7 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
+builder.Configuration.AddJsonFile("appsettings.json");
 
 var app = builder.Build();
 
